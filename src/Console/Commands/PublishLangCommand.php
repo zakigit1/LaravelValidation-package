@@ -2,6 +2,7 @@
 
 namespace Bousbaadev\LangPublisher\Console\Commands;
 
+use Bousbaadev\LangPublisher\LangPublisherServiceProvider;
 use Illuminate\Console\Command;
 
 class PublishLangCommand extends Command
@@ -84,12 +85,11 @@ class PublishLangCommand extends Command
         // Run the vendor:publish command
         $this->call('vendor:publish', $params);
 
-        // Ensure the language files are properly initialized
-        $this->getLaravel()->make('files')->ensureDirectoryExists(lang_path());
-
-        // Trigger auto-publish to ensure all locales exist
-        $this->getLaravel()->make('Bousbaadev\LangPublisher\LangPublisherServiceProvider')
-            ->handleAutoPublish();
+        $langPath = $this->laravel->make('path.lang');
+        
+        // Ensure all locales exist
+        $provider = new LangPublisherServiceProvider($this->laravel);
+        $provider->boot();
 
         $this->info('Language files published successfully!');
 

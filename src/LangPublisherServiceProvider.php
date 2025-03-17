@@ -19,18 +19,43 @@ class LangPublisherServiceProvider extends ServiceProvider
     }
 
     /**
+     *! V2
      * Bootstrap services.
      */
+    // public function boot(): void
+    // {
+    //     // Define publishable language files
+    //     $this->publishes([
+    //         __DIR__ . '/../lang' => $this->getLangPath(),
+    //     ], 'lang');
+
+    //     // Auto-publish when package is installed
+    //     $this->registerPublishingCallbacks();
+    // }
+
     public function boot(): void
     {
-        // Define publishable language files
         $this->publishes([
             __DIR__ . '/../lang' => $this->getLangPath(),
         ], 'lang');
 
-        // Auto-publish when package is installed
-        $this->registerPublishingCallbacks();
+        if ($this->app->runningInConsole()) {
+            $langPath = $this->getLangPath();
+
+            if (!file_exists($langPath)) {
+                $this->app->make('files')->makeDirectory($langPath, 0755, true);
+            }
+
+            // Ensure all locales exist
+            $this->ensureLocaleExists($langPath, 'en');
+            $this->ensureLocaleExists($langPath, 'ar');
+            $this->ensureLocaleExists($langPath, 'fr');
+        }
     }
+
+
+
+
 
     /**
      * Get the lang path for the application.
