@@ -296,6 +296,34 @@ class LangPublisherServiceProvider extends ServiceProvider
     //     );
     // }
 
+    // !V3 (laravle 10)
+    // protected function ensureLocaleExists(string $basePath, string $locale): void
+    // {
+    //     $localePath = $basePath . '/' . $locale;
+
+    //     // Create locale directory if it doesn't exist
+    //     if (!file_exists($localePath)) {
+    //         mkdir($localePath, 0755, true);
+    //     }
+
+    //     // List of files to copy
+    //     $files = [
+    //         'validation.php',
+    //         'auth.php',
+    //         'pagination.php',
+    //         'passwords.php'
+    //     ];
+
+    //     // Copy each language file
+    //     foreach ($files as $file) {
+    //         $sourcePath = __DIR__ . '/../lang/' . $locale . '/' . $file;
+    //         $targetPath = $localePath . '/' . $file;
+
+    //         if (file_exists($sourcePath)) {
+    //             copy($sourcePath, $targetPath);
+    //         }
+    //     }
+    // }
 
     protected function ensureLocaleExists(string $basePath, string $locale): void
     {
@@ -320,7 +348,22 @@ class LangPublisherServiceProvider extends ServiceProvider
             $targetPath = $localePath . '/' . $file;
 
             if (file_exists($sourcePath)) {
-                copy($sourcePath, $targetPath);
+                try {
+                    // Try to copy with error handling
+                    if (!@copy($sourcePath, $targetPath)) {
+                        // If direct copy fails, try reading and writing
+                        $content = file_get_contents($sourcePath);
+                        file_put_contents($targetPath, $content);
+                    }
+                } catch (\Exception $e) {
+                    // Log error but don't fail completely
+                    if ($this->app->bound('log')) {
+                        $this->app->make('log')->warning(
+                            "Failed to copy language file: {$file} for locale: {$locale}",
+                            ['error' => $e->getMessage()]
+                        );
+                    }
+                }
             }
         }
     }
