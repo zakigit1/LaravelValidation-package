@@ -47,23 +47,52 @@ class PublishLangCommand extends Command
     //     return Command::SUCCESS;
     // }
 
+
+    //! V1
+    // public function handle(): int
+    // {
+    //     $this->info('Publishing language files...');
+
+    //     $force = $this->option('force');
+
+    //     // Build parameters for the vendor:publish command
+    //     $params = [
+    //         '--tag' => 'lang',
+    //         '--force' => $force
+    //     ];
+
+    //     // Run the vendor:publish command once
+    //     $this->call('vendor:publish', $params);
+
+    //     $this->info('Language files published successfully!');
+
+    //     return Command::SUCCESS;
+    // }
+
     public function handle(): int
     {
         $this->info('Publishing language files...');
-    
+
         $force = $this->option('force');
-    
+
         // Build parameters for the vendor:publish command
         $params = [
             '--tag' => 'lang',
             '--force' => $force
         ];
-    
-        // Run the vendor:publish command once
+
+        // Run the vendor:publish command
         $this->call('vendor:publish', $params);
-    
+
+        // Ensure the language files are properly initialized
+        $this->getLaravel()->make('files')->ensureDirectoryExists(lang_path());
+
+        // Trigger auto-publish to ensure all locales exist
+        $this->getLaravel()->make('Bousbaadev\LangPublisher\LangPublisherServiceProvider')
+            ->handleAutoPublish();
+
         $this->info('Language files published successfully!');
-    
+
         return Command::SUCCESS;
     }
 }

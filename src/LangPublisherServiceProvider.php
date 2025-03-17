@@ -106,6 +106,26 @@ class LangPublisherServiceProvider extends ServiceProvider
     // }
 
 
+    // !V1
+    // protected function handleAutoPublish(): void
+    // {
+    //     $langPath = $this->getLangPath();
+
+    //     // First ensure base lang directory exists
+    //     if (!file_exists($langPath)) {
+    //         $this->app->make('files')->makeDirectory($langPath, 0755, true);
+    //     }
+
+    //     // Check if lang folder has been published
+    //     if (!$this->langFolderPublished($langPath)) {
+    //         $this->publishLangFolder();
+    //     }
+
+    //     // Ensure ar and fr validation folders exist
+    //     $this->ensureLocaleExists($langPath, 'ar');
+    //     $this->ensureLocaleExists($langPath, 'fr');
+    // }
+
     protected function handleAutoPublish(): void
     {
         $langPath = $this->getLangPath();
@@ -115,15 +135,14 @@ class LangPublisherServiceProvider extends ServiceProvider
             $this->app->make('files')->makeDirectory($langPath, 0755, true);
         }
 
-        // Check if lang folder has been published
-        if (!$this->langFolderPublished($langPath)) {
-            $this->publishLangFolder();
-        }
-
-        // Ensure ar and fr validation folders exist
+        // Ensure all locales exist (en, ar, fr)
+        $this->ensureLocaleExists($langPath, 'en');
         $this->ensureLocaleExists($langPath, 'ar');
         $this->ensureLocaleExists($langPath, 'fr');
     }
+
+
+
 
     protected function langFolderPublished(string $path): bool
     {
@@ -192,12 +211,12 @@ class LangPublisherServiceProvider extends ServiceProvider
     protected function callArtisanPublish(): void
     {
         $this->app->make('files')->ensureDirectoryExists($this->getLangPath());
-    
+
         // Remove this duplicate call since it's already defined in boot()
         // $this->publishes([
         //     __DIR__ . '/../lang' => $this->getLangPath(),
         // ], 'lang');
-    
+
         $this->app->make('command.vendor.publish')->handle([
             '--tag' => 'lang',
             '--force' => true,
@@ -210,9 +229,30 @@ class LangPublisherServiceProvider extends ServiceProvider
 
 
 
-    /**
+    /** !V1
      * Ensure locale exists and has validation translations.
      */
+    // protected function ensureLocaleExists(string $basePath, string $locale): void
+    // {
+    //     $localePath = $basePath . '/' . $locale;
+
+    //     // Create locale directory if it doesn't exist
+    //     if (!file_exists($localePath)) {
+    //         mkdir($localePath, 0755, true);
+    //     }
+
+    //     // Check if validation.php exists in locale folder
+    //     $validationFile = $localePath . '/validation.php';
+    //     if (!file_exists($validationFile)) {
+    //         // Copy our package validation file
+    //         copy(
+    //             __DIR__ . '/../lang/' . $locale . '/validation.php',
+    //             $validationFile
+    //         );
+    //     }
+    // }
+
+
     protected function ensureLocaleExists(string $basePath, string $locale): void
     {
         $localePath = $basePath . '/' . $locale;
@@ -222,14 +262,11 @@ class LangPublisherServiceProvider extends ServiceProvider
             mkdir($localePath, 0755, true);
         }
 
-        // Check if validation.php exists in locale folder
+        // Always copy validation file to ensure we have latest version
         $validationFile = $localePath . '/validation.php';
-        if (!file_exists($validationFile)) {
-            // Copy our package validation file
-            copy(
-                __DIR__ . '/../lang/' . $locale . '/validation.php',
-                $validationFile
-            );
-        }
+        copy(
+            __DIR__ . '/../lang/' . $locale . '/validation.php',
+            $validationFile
+        );
     }
 }
