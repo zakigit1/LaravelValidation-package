@@ -19,7 +19,7 @@ class PublishLangCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Publish language files including Arabic and French validation translations';
+    protected $description = 'Publish language files including Arabic and French translations for auth, validation, pagination and passwords';
 
     /**
      * Execute the console command.

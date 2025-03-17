@@ -278,6 +278,25 @@ class LangPublisherServiceProvider extends ServiceProvider
     // }
 
 
+    // !V2 (just validation file)
+    // protected function ensureLocaleExists(string $basePath, string $locale): void
+    // {
+    //     $localePath = $basePath . '/' . $locale;
+
+    //     // Create locale directory if it doesn't exist
+    //     if (!file_exists($localePath)) {
+    //         mkdir($localePath, 0755, true);
+    //     }
+
+    //     // Always copy validation file to ensure we have latest version
+    //     $validationFile = $localePath . '/validation.php';
+    //     copy(
+    //         __DIR__ . '/../lang/' . $locale . '/validation.php',
+    //         $validationFile
+    //     );
+    // }
+
+
     protected function ensureLocaleExists(string $basePath, string $locale): void
     {
         $localePath = $basePath . '/' . $locale;
@@ -287,11 +306,22 @@ class LangPublisherServiceProvider extends ServiceProvider
             mkdir($localePath, 0755, true);
         }
 
-        // Always copy validation file to ensure we have latest version
-        $validationFile = $localePath . '/validation.php';
-        copy(
-            __DIR__ . '/../lang/' . $locale . '/validation.php',
-            $validationFile
-        );
+        // List of files to copy
+        $files = [
+            'validation.php',
+            'auth.php',
+            'pagination.php',
+            'passwords.php'
+        ];
+
+        // Copy each language file
+        foreach ($files as $file) {
+            $sourcePath = __DIR__ . '/../lang/' . $locale . '/' . $file;
+            $targetPath = $localePath . '/' . $file;
+
+            if (file_exists($sourcePath)) {
+                copy($sourcePath, $targetPath);
+            }
+        }
     }
 }
