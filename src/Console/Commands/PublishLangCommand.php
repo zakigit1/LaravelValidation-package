@@ -1,6 +1,6 @@
 <?php
 
-namespace bousbaadev\LangPublisher\Console\Commands;
+namespace Bousbaadev\LangPublisher\Console\Commands;
 
 use Illuminate\Console\Command;
 
@@ -23,27 +23,47 @@ class PublishLangCommand extends Command
     /**
      * Execute the console command.
      */
+    // public function handle(): int
+    // {
+    //     $this->info('Publishing language files...');
+
+    //     $force = $this->option('force');
+
+    //     // Tag for lang files
+    //     $tag = 'lang';
+
+    //     // Build parameters for the vendor:publish command
+    //     $params = ['--tag' => $tag];
+
+    //     if ($force) {
+    //         $params['--force'] = true;
+    //     }
+
+    //     // Run the vendor:publish command
+    //     $this->call('vendor:publish', $params);
+
+    //     $this->info('Language files published successfully!');
+
+    //     return Command::SUCCESS;
+    // }
+
     public function handle(): int
     {
         $this->info('Publishing language files...');
-        
+    
         $force = $this->option('force');
-        
-        // Tag for lang files
-        $tag = 'lang';
-        
+    
         // Build parameters for the vendor:publish command
-        $params = ['--tag' => $tag];
-        
-        if ($force) {
-            $params['--force'] = true;
-        }
-        
-        // Run the vendor:publish command
+        $params = [
+            '--tag' => 'lang',
+            '--force' => $force
+        ];
+    
+        // Run the vendor:publish command once
         $this->call('vendor:publish', $params);
-        
+    
         $this->info('Language files published successfully!');
-        
+    
         return Command::SUCCESS;
     }
 }

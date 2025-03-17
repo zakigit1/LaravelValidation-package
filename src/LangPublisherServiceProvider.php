@@ -62,14 +62,60 @@ class LangPublisherServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Handle auto-publishing of language files.
-     */
+    // /**
+    // *! V0
+    //  * Handle auto-publishing of language files.
+    //  */
+    // protected function handleAutoPublish(): void
+    // {
+    //     $langPath = $this->getLangPath();
+
+    //     // Check if lang folder exists and has been published
+    //     if (!$this->langFolderPublished($langPath)) {
+    //         $this->publishLangFolder();
+    //     }
+
+    //     // Ensure ar and fr validation folders exist
+    //     $this->ensureLocaleExists($langPath, 'ar');
+    //     $this->ensureLocaleExists($langPath, 'fr');
+    // }
+
+    // /**
+    // *! V0
+    //  * Check if lang folder has been published.
+    //  */
+    // protected function langFolderPublished(string $path): bool
+    // {
+    //     // If lang path doesn't exist at all
+    //     if (!file_exists($path)) {
+    //         return false;
+    //     }
+
+    //     // Check if English validation file exists (a common core translation)
+    //     // For Laravel 10+, it's directly in the lang/en directory
+    //     if (file_exists($path . '/en/validation.php')) {
+    //         return true;
+    //     }
+
+    //     // For older Laravel versions, check the old location
+    //     if (file_exists($path . '/validation.php')) {
+    //         return true;
+    //     }
+
+    //     return false;
+    // }
+
+
     protected function handleAutoPublish(): void
     {
         $langPath = $this->getLangPath();
 
-        // Check if lang folder exists and has been published
+        // First ensure base lang directory exists
+        if (!file_exists($langPath)) {
+            $this->app->make('files')->makeDirectory($langPath, 0755, true);
+        }
+
+        // Check if lang folder has been published
         if (!$this->langFolderPublished($langPath)) {
             $this->publishLangFolder();
         }
@@ -79,9 +125,6 @@ class LangPublisherServiceProvider extends ServiceProvider
         $this->ensureLocaleExists($langPath, 'fr');
     }
 
-    /**
-     * Check if lang folder has been published.
-     */
     protected function langFolderPublished(string $path): bool
     {
         // If lang path doesn't exist at all
@@ -103,6 +146,20 @@ class LangPublisherServiceProvider extends ServiceProvider
         return false;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Publish language folder.
      */
@@ -112,22 +169,46 @@ class LangPublisherServiceProvider extends ServiceProvider
     }
 
     /**
-     * Call artisan publish command.
+     *! V0
+     * Call artisan publish command. 
      */
+    // protected function callArtisanPublish(): void
+    // {
+    //     $this->app->make('files')->ensureDirectoryExists($this->getLangPath());
+
+    //     // Publish language files
+    //     $this->publishes([
+    //         __DIR__ . '/../lang' => $this->getLangPath(),
+    //     ], 'lang');
+
+    //     $this->app->make('command.vendor.publish')->handle([
+    //         '--tag' => 'lang',
+    //         '--force' => true,
+    //     ]);
+    // }
+
+
+
     protected function callArtisanPublish(): void
     {
         $this->app->make('files')->ensureDirectoryExists($this->getLangPath());
-
-        // Publish language files
-        $this->publishes([
-            __DIR__ . '/../lang' => $this->getLangPath(),
-        ], 'lang');
-
+    
+        // Remove this duplicate call since it's already defined in boot()
+        // $this->publishes([
+        //     __DIR__ . '/../lang' => $this->getLangPath(),
+        // ], 'lang');
+    
         $this->app->make('command.vendor.publish')->handle([
             '--tag' => 'lang',
             '--force' => true,
         ]);
     }
+
+
+
+
+
+
 
     /**
      * Ensure locale exists and has validation translations.
