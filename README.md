@@ -79,7 +79,7 @@ It provides translations for the following files:
 We welcome contributions to add support for additional languages. Here's how you can contribute:
 
 1. **Fork the Repository**
-   - Visit the [GitHub repository](https://github.com/bousbaadev/lang-publisher)
+   - Visit the [GitHub repository](https://github.com/zakigit1/LaravelValidation-package)
    - Click the "Fork" button in the top-right corner
 
 2. **Clone Your Fork**
